@@ -1,0 +1,75 @@
+# ==============================================================================
+# Git Ignore - Factorio 2.0 Video to Blueprint Generator
+# ==============================================================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist-python/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- .NET & Visual Studio ---
+**/[Bb]in/
+**/[Oo]bj/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.userprefs
+*.dbmdl
+*.pdb
+.vs/
+.vscode/
+.idea/
+TestResult*
+packages/
+
+# --- Local Binaries & Standalone Distribution Builds ---
+dist/
+publish/
+FactorioVideoToBlueprint/dist/
+
+# --- Test Data, Scratch Scripts & Local Dumps ---
+scratch/
+help.txt
+/blueprint.txt
+/blueprint_*.txt
+*.bak
+safe_signals_pool.json.bak
+core/circuit_engine_v3_old.py
+*.tmp
+*.log
+
+# --- Local Media Dumps ---
+test*.mp4
+test*.gif
+sample*.mp4
+sample*.gif
+
+# --- Operating System Files ---
+Thumbs.db
+desktop.ini
+.DS_Store

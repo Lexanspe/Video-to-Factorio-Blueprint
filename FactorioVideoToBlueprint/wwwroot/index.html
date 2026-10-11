@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Factorio 2.0 Video to Blueprint Generator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- SOL PANEL: AYARLAR VE KONTROLLER -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-icon">⚡</div>
+        <div class="logo-text">
+          <h1>FACTORIO 2.0</h1>
+          <span class="subtitle" data-i18n="appSubtitle">VIDEO &amp; ROM BLUEPRINT GENERATOR</span>
+        </div>
+        <div class="lang-switch-container" id="langSwitchContainer">
+          <button type="button" class="lang-btn active" data-lang="en">EN</button>
+          <button type="button" class="lang-btn" data-lang="tr">TR</button>
+        </div>
+      </div>
+
+      <div class="sidebar-content">
+        <!-- 1. VIDEO / GIF KAYNAĞI -->
+        <section class="card-section">
+          <div class="section-title">
+            <span class="step-badge">1</span>
+            <h2 data-i18n="secVideoSource">Video / GIF Source</h2>
+          </div>
+          <div class="btn-group-row">
+            <button id="btnSelectFile" class="btn btn-primary">
+              <span class="btn-icon">📁</span> <span data-i18n="btnSelectVideo">Select Video</span>
+            </button>
+            <button id="btnLoadDemo" class="btn btn-secondary">
+              <span class="btn-icon">✨</span> <span data-i18n="btnLoadDemo">Load Demo</span>
+            </button>
+          </div>
+          <input type="file" id="browserFileInput" style="display:none" accept="video/*,.gif,.mp4,.webm,.avi,.mov,.mkv">
+          <div class="file-info-badge" id="fileInfoBadge">
+            <div class="file-name" id="lblFileName">Active: Built-in Demo Animation</div>
+            <div class="file-details" id="lblFileDetails">16x16 (1:1 Ratio) • 16 Frames • 5.0 FPS • 3.2s</div>
+          </div>
+        </section>
+
+        <!-- 2. DEVRE MOTORU -->
+        <section class="card-section">
+          <div class="section-title">
+            <span class="step-badge">2</span>
+            <h2 data-i18n="secCircuitEngine">Circuit Engine</h2>
+          </div>
+          <div class="segment-group" id="engineSegment">
+            <button type="button" class="segment-btn active" data-engine="v3">2-bit</button>
+            <button type="button" class="segment-btn" data-engine="v2">9-bit</button>
+            <button type="button" class="segment-btn" data-engine="v1">24-bit</button>
+          </div>
+          <div class="engine-desc-box">
+            <p id="lblEngineDesc" class="engine-desc-text">
+              16 frames/signal 2-bit grayscale, single-combinator TrueColor adapter (* 5.5M), Selector clock.
+            </p>
+            <div id="boxEngineWarning" class="engine-warning-box hidden">
+              <span class="warning-icon">⚠️</span>
+              <span class="warning-text" data-i18n="engineWarning">High resolution may produce a very large blueprint size.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. MONİTÖR ÇÖZÜNÜRLÜĞÜ -->
+        <section class="card-section">
+          <div class="section-title">
+            <span class="step-badge">3</span>
+            <h2 data-i18n="secMonitorResolution">Monitor Resolution</h2>
+          </div>
+          <!-- 4 Preset Buttons -->
+          <div class="preset-btn-row">
+            <button type="button" class="preset-btn active" data-height="16">16p</button>
+            <button type="button" class="preset-btn" data-height="32">32p</button>
+            <button type="button" class="preset-btn" data-height="48">48p</button>
+            <button type="button" class="preset-btn" data-height="64">64p</button>
+          </div>
+          <div class="height-input-row">
+            <label for="inputHeight" class="input-label" data-i18n="lblHeight">Height:</label>
+            <div class="input-number-wrapper">
+              <input type="number" id="inputHeight" min="1" max="1080" value="16" class="form-input">
+              <span class="input-unit">px</span>
+            </div>
+          </div>
+          <div class="resolution-summary" id="lblCalcResolution">
+            Resolution: 16 x 16 (256 Lamps) • 1:1 Ratio
+          </div>
+        </section>
+
+        <!-- 4. ROM DEVRESİ KONUMU -->
+        <section class="card-section">
+          <div class="section-title">
+            <span class="step-badge">4</span>
+            <h2 data-i18n="secRomPlacement">ROM Circuit Placement</h2>
+          </div>
+          <!-- 1. Satır: Yön Butonları -->
+          <div class="segment-group" id="romDirectionGroup">
+            <button type="button" class="segment-btn active" data-dir="horizontal">
+              <span class="seg-icon">⬌</span> <span data-i18n="optHorizontal">Horizontal</span>
+            </button>
+            <button type="button" class="segment-btn" data-dir="vertical">
+              <span class="seg-icon">⬍</span> <span data-i18n="optVertical">Vertical</span>
+            </button>
+          </div>
+          <!-- 2. Satır: Dinamik Konum Butonları -->
+          <div class="segment-group sub-segments" id="romPlacementGroup">
+            <!-- Dinamik doldurulacak -->
+          </div>
+
+          <!-- Seçenekler: Kompakt ROM & Tüm Satırları Doldur -->
+          <div class="checkbox-list">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="chkCompactRom" checked>
+              <span class="checkmark"></span>
+              <div class="checkbox-label-block">
+                <span class="chk-title" data-i18n="chkCompactRomTitle">Compact ROM (Recommended)</span>
+                <span class="chk-desc" data-i18n="chkCompactRomDesc">Removes spacing between combinators (0 tiles).</span>
+              </div>
+            </label>
+            <label class="custom-checkbox">
+              <input type="checkbox" id="chkFillAllRows" checked>
+              <span class="checkmark"></span>
+              <div class="checkbox-label-block">
+                <span class="chk-title" data-i18n="chkFillAllRowsTitle">Fill All Rows (Recommended)</span>
+                <span class="chk-desc" data-i18n="chkFillAllRowsDesc">Distributes ROM combinators across multiple rows along monitor.</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Trafo Niteliği -->
+          <div class="dropdown-row">
+            <label for="selSubstationQuality" class="input-label" data-i18n="lblSubstationQuality">Substation Quality:</label>
+            <select id="selSubstationQuality" class="form-select">
+              <option value="legendary" data-i18n="subQualityLegendary" selected>Legendary</option>
+              <option value="epic" data-i18n="subQualityEpic">Epic</option>
+              <option value="rare" data-i18n="subQualityRare">Rare</option>
+              <option value="uncommon" data-i18n="subQualityUncommon">Uncommon</option>
+              <option value="normal" data-i18n="subQualityNormal">Normal (Standard)</option>
+              <option value="none" data-i18n="subQualityNone">No Substation (External Power / Sandbox)</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- 5. FPS VE KARE SAYISI -->
+        <section class="card-section">
+          <div class="section-title">
+            <span class="step-badge">5</span>
+            <h2 data-i18n="secFpsAndFrames">FPS &amp; Frame Count</h2>
+          </div>
+          <!-- FPS Butonları -->
+          <div class="fps-btn-grid" id="fpsButtonGroup">
+            <button type="button" class="fps-btn" data-fps="60">60 FPS</button>
+            <button type="button" class="fps-btn" data-fps="30">30 FPS</button>
+            <button type="button" class="fps-btn" data-fps="20">20 FPS</button>
+            <button type="button" class="fps-btn" data-fps="15">15 FPS</button>
+            <button type="button" class="fps-btn" data-fps="10">10 FPS</button>
+            <button type="button" class="fps-btn active" data-fps="5">5 FPS</button>
+            <button type="button" class="fps-btn" data-fps="1">1 FPS</button>
+          </div>
+
+          <div class="frame-limit-block">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="chkAllVideo" checked>
+              <span class="checkmark"></span>
+              <span class="chk-title" data-i18n="chkAllVideo">All Video</span>
+            </label>
+            <div class="max-frames-row" id="maxFramesRow">
+              <label for="inputMaxFrames" class="input-label" data-i18n="lblMaxFrames">Max Frames:</label>
+              <input type="number" id="inputMaxFrames" min="1" max="99999" value="16" disabled class="form-input">
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. ROM PARÇALAMA (MODÜLER DİLİMLER) -->
+        <section class="card-section">
+          <div class="section-title">
+            <span class="step-badge">6</span>
+            <h2 data-i18n="secRomSlicing">ROM Slicing (Modular Parts)</h2>
+          </div>
+          <div class="slider-control-row">
+            <label for="sliderParts" class="input-label" data-i18n="lblPartCount">Part Count:</label>
+            <div class="parts-value-badge" id="lblPartsCount">1 Part</div>
+          </div>
+          <input type="range" id="sliderParts" min="1" max="16" value="1" class="form-range">
+          <div class="slider-ticks">
+            <span>1</span><span>4</span><span>8</span><span>12</span><span>16</span>
+          </div>
+        </section>
+      </div>
+    </aside>
+
+    <!-- SAĞ PANEL: GÖRSEL ŞEMA VE İSTATİSTİKLER -->
+    <main class="main-content">
+      <!-- Üst Aksiyon & Durum Çubuğu -->
+      <header class="action-header">
+        <div class="action-buttons-group">
+          <button id="btnGenerate" class="btn btn-action-generate">
+            <span class="btn-icon">⚡</span> <span id="lblGenerateText" data-i18n="btnGenerateSingle">GENERATE BLUEPRINT</span>
+          </button>
+          <button id="btnAbort" class="btn btn-action-abort" style="display: none;">
+            <span class="btn-icon">⏹</span> <span data-i18n="btnAbort">ABORT</span>
+          </button>
+          <button id="btnSaveBlueprint" class="btn btn-action-save" disabled>
+            <span class="btn-icon">💾</span> <span data-i18n="btnSaveBlueprint">Save .txt</span>
+          </button>
+        </div>
+
+        <div class="status-progress-block">
+          <div class="status-text-row">
+            <span id="lblStatusText" class="status-label" data-i18n="statusReady">Ready. Press button to generate blueprint.</span>
+            <span id="lblProgressPct" class="progress-pct">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Orta Alan: İnteraktif Mimarî Görselleştirici (Canvas) -->
+      <section class="diagram-section">
+        <div class="diagram-header-bar">
+          <div class="diagram-title">
+            <span class="icon">📐</span> <span data-i18n="titleDiagram">ARCHITECTURAL DIAGRAM &amp; PART SELECTOR</span>
+          </div>
+          <div class="diagram-header-right">
+            <div class="slice-selector-tabs" id="sliceTabsContainer">
+              <!-- Parça butonları dinamik gelecek -->
+            </div>
+            <div class="canvas-zoom-toolbar" id="zoomToolbar" title="Interface Scale (Ctrl + Wheel)">
+              <button type="button" class="zoom-btn" id="btnZoomOut" title="Zoom Out (Ctrl -)">−</button>
+              <span class="zoom-level-badge" id="lblZoomLevel" title="Interface Scale">%100</span>
+              <button type="button" class="zoom-btn" id="btnZoomIn" title="Zoom In (Ctrl +)">+</button>
+              <button type="button" class="zoom-btn" id="btnZoomReset" title="Reset Zoom (Ctrl 0)">⟲</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="canvas-wrapper" id="canvasWrapper">
+          <canvas id="diagramCanvas"></canvas>
+          <div class="canvas-hint-badge">
+            <span id="lblCanvasHint" data-i18n="canvasHintBadge">🔍 Ctrl + Wheel: Zoom interface in/out</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Alt Panel: Özet İstatistik Kartları -->
+      <footer class="stats-footer">
+        <div class="stat-card">
+          <div class="stat-icon">⚡</div>
+          <div class="stat-body">
+            <div class="stat-label" data-i18n="statTotalCombinators">Total Combinators</div>
+            <div class="stat-value" id="valTotalCombinators">15</div>
+            <div class="stat-sub" id="valPartCombinators">Part 1: 15 combs</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📺</div>
+          <div class="stat-body">
+            <div class="stat-label" data-i18n="statMonitorScreen">Monitor Display</div>
+            <div class="stat-value" id="valMonitorSize">16 x 16</div>
+            <div class="stat-sub" id="valMonitorLamps">256 Lamps</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🎬</div>
+          <div class="stat-body">
+            <div class="stat-label" data-i18n="statVideoDuration">Video &amp; Duration</div>
+            <div class="stat-value" id="valVideoFrames">16 Frames</div>
+            <div class="stat-sub" id="valVideoFpsDuration">5.0 FPS • 3.2s</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-body">
+            <div class="stat-label" data-i18n="statStripesPacks">Stripes &amp; Packs</div>
+            <div class="stat-value" id="valStripesPacks">1 Stripe</div>
+            <div class="stat-sub" id="valPacksTotal">1 Pack (16 f/pack)</div>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
