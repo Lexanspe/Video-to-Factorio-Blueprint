@@ -1,4 +1,4 @@
-# Factorio 2.0 Video-to-Blueprint Generator ⚡
+# Video to Factorio 2.0+ Generator
 
 [![Factorio Space Age](https://img.shields.io/badge/Factorio-2.0%20Space%20Age-orange?logo=factorio)](https://factorio.com/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-0078d4?logo=linux)](https://github.com/)
