@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <AssemblyName>FactorioVideoToBlueprint</AssemblyName>
-    <RootNamespace>FactorioVideoToBlueprint</RootNamespace>
+    <AssemblyName>VideoToFactorioBlueprint</AssemblyName>
+    <RootNamespace>VideoToFactorioBlueprint</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

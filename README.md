@@ -14,7 +14,7 @@
 
 Converts video files (`.mp4`, `.webm`, `.avi`, `.mov`) and `.gif` animations into functional in-game video player blueprints for **Factorio 2.0 (Space Age)**. Each blueprint contains a display screen of small lamps, a ROM circuit bank holding encoded video data, centralized decoders, a master clock, and a power distribution grid.
 
-![Application UI Preview](assets/preview.png)
+![Application UI Preview](assets/preview_en.png)
 
 ---
 
@@ -37,7 +37,7 @@ The generator provides three distinct circuit engines. Each engine is built for 
 
 ### 2.1. Monitor Resolution & Aspect Ratio
 * **Height**: Sets the number of lamp rows on the monitor (e.g. 16, 32, 48, 64).
-* **Width**: Automatically computed from the source media aspect ratio ($W = \text{round}(H \times \frac{W_{orig}}{H_{orig}})$) so the image is never stretched or distorted. Total lamps = $W \times H$.
+* **Width**: Automatically computed from the source media aspect ratio (*W = round(H × W_orig / H_orig)*) so the image is never stretched or distorted. Total lamps = *W × H*.
 
 ### 2.2. ROM Circuit Placement & Layout
 * **Direction**:
@@ -47,7 +47,7 @@ The generator provides three distinct circuit engines. Each engine is built for 
 * **Fill All Rows (Recommended)**: Folds ROM combinators into a 2D matrix along the monitor's dimensions instead of extending into a single long strip across the map.
 
 ### 2.3. Substation Quality & Power Grid
-* **Quality Selector**: Selects substation tier (`normal`, `uncommon`, `rare`, `epic`, `legendary`), scaling supply reach from $18\times 18$ up to $28\times 28$. Copper power connections are wired automatically.
+* **Quality Selector**: Selects substation tier (`normal`, `uncommon`, `rare`, `epic`, `legendary`), scaling supply reach from 18×18 up to 28×28 tiles. Copper power connections are wired automatically.
 * **No Substation (`none`)**: Excludes all power poles for sandbox maps or floor-powered grids.
 
 ### 2.4. Framerate (FPS) & Frame Count
@@ -63,7 +63,7 @@ The generator provides three distinct circuit engines. Each engine is built for 
 ## 3. How to Run
 
 ### Windows (Desktop GUI)
-Double-click `FactorioVideoToBlueprint.exe` or execute:
+Double-click `VideoToFactorioBlueprint.exe` or execute:
 ```bat
 run.bat
 ```
@@ -116,7 +116,7 @@ factorio-video-to-blueprint/
 │   ├── valid_base_items.json
 │   └── valid_base_signals.json
 ├── core/                             # Video processor & circuit compilation engines (V1, V2, V3)
-├── FactorioVideoToBlueprint/         # Windows WPF application & Web UI frontend (wwwroot)
+├── VideoToFactorioBlueprint/         # Windows WPF application & Web UI frontend (wwwroot)
 ├── server.py                         # Cross-platform Web server (Linux, macOS, Windows)
 ├── run.sh                            # Linux & macOS one-click launcher
 ├── run.bat                           # Windows one-click launcher
@@ -152,7 +152,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 Video dosyalarını (`.mp4`, `.webm`, `.avi`, `.mov`) ve `.gif` animasyonlarını **Factorio 2.0 (Space Age)** oyununda çalışan video oynatıcı blueprint'lerine dönüştürür. Üretilen blueprint; küçük lambalardan oluşan bir ekran, kodlanmış video verilerini saklayan bir ROM devre bankası, şerit başı merkezi dekoderler, saat devresi ve elektrik dağıtım ağını içerir.
 
-![Uygulama Arayüzü Önizlemesi](assets/preview.png)
+![Uygulama Arayüzü Önizlemesi](assets/preview_tr.png)
 
 ---
 
@@ -175,7 +175,7 @@ Uygulama, farklı kullanım ihtiyaçlarına göre tasarlanmış 3 bağımsız de
 
 ### 2.1. Monitör Çözünürlüğü ve En/Boy Oranı
 * **Yükseklik**: Monitörün lamba satır sayısını belirler (örn. 16, 32, 48, 64).
-* **Genişlik**: Videonun orijinal en/boy oranından otomatik hesaplanır ($W = \text{round}(H \times \frac{W_{orig}}{H_{orig}})$); görüntü asla basıklaşmaz veya esnemez. Toplam lamba sayısı $W \times H$ olur.
+* **Genişlik**: Videonun orijinal en/boy oranından otomatik hesaplanır (*W = round(H × W_orig / H_orig)*); görüntü asla basıklaşmaz veya esnemez. Toplam lamba sayısı *W × H* olur.
 
 ### 2.2. ROM Devresi Konumu ve Yerleşim
 * **Yön (Direction)**:
@@ -185,7 +185,7 @@ Uygulama, farklı kullanım ihtiyaçlarına göre tasarlanmış 3 bağımsız de
 * **Tüm Satırları Doldur (Önerilen)**: ROM kombinatörlerini haritada tek bir ince hat halinde uzatmak yerine monitörün satır/sütun genişliği boyunca 2B blok halinde yerleştirir.
 
 ### 2.3. Trafo Niteliği ve Elektrik Şebekesi
-* **Nitelik Seçimi**: Trafo kalitesine (`normal`, `uncommon`, `rare`, `epic`, `legendary`) göre elektrik kapsama alanı $18\times 18$'den $28\times 28$'e kadar genişler. Bakır elektrik kabloları otomatik örülür.
+* **Nitelik Seçimi**: Trafo kalitesine (`normal`, `uncommon`, `rare`, `epic`, `legendary`) göre elektrik kapsama alanı 18×18'den 28×28 karoya kadar genişler. Bakır elektrik kabloları otomatik örülür.
 * **Trafosuz Mod (`none`)**: Yaratıcı haritalar ve zemin elektriği modları için trafoları devre dışı bırakır.
 
 ### 2.4. FPS ve Kare Kontrolü
@@ -201,7 +201,7 @@ Uygulama, farklı kullanım ihtiyaçlarına göre tasarlanmış 3 bağımsız de
 ## 3. Çalıştırma Yöntemleri
 
 ### Windows (Masaüstü Uygulaması)
-`FactorioVideoToBlueprint.exe` dosyasını çalıştırın veya terminalden:
+`VideoToFactorioBlueprint.exe` dosyasını çalıştırın veya terminalden:
 ```bat
 run.bat
 ```
@@ -254,7 +254,7 @@ factorio-video-to-blueprint/
 │   ├── valid_base_items.json
 │   └── valid_base_signals.json
 ├── core/                             # Video işleme ve devre derleme motorları (V1, V2, V3)
-├── FactorioVideoToBlueprint/         # Windows WPF uygulaması ve Web arayüz dosyaları (wwwroot)
+├── VideoToFactorioBlueprint/         # Windows WPF uygulaması ve Web arayüz dosyaları (wwwroot)
 ├── server.py                         # Çapraz platform Web sunucusu (Linux, macOS, Windows)
 ├── run.sh                            # Linux ve macOS tek tıkla başlatıcı
 ├── run.bat                           # Windows tek tıkla başlatıcı

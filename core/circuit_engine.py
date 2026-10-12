@@ -331,6 +331,10 @@ def compile_blueprint(
                     r0_left = [lamp_grid[(lx, ys)] for lx in range(w_left) if (lx, ys) in lamp_grid]
                     if r0_left:
                         stripe_feed_lamps_B[s] = r0_left[0]
+                    elif leftmost_lamps:
+                        stripe_feed_lamps_B[s] = leftmost_lamps[0]
+                    elif lamp_grid:
+                        stripe_feed_lamps_B[s] = next(iter(lamp_grid.values()))
 
                     # Sağ Blok: x in [w_left, width - 1]
                     for row_y in range(ys, ye):
@@ -365,6 +369,10 @@ def compile_blueprint(
                     r0_right = [lamp_grid[(lx, ys)] for lx in range(w_left, width) if (lx, ys) in lamp_grid]
                     if r0_right:
                         stripe_feed_lamps_A[s] = r0_right[-1]
+                    elif rightmost_lamps:
+                        stripe_feed_lamps_A[s] = rightmost_lamps[0]
+                    elif lamp_grid:
+                        stripe_feed_lamps_A[s] = next(iter(lamp_grid.values()))
 
                 else: # Tek blok (sağ veya sol)
                     for row_y in range(ys, ye):
@@ -399,6 +407,10 @@ def compile_blueprint(
                     r0 = [lamp_grid[(lx, ys)] for lx in range(width) if (lx, ys) in lamp_grid]
                     if r0:
                         stripe_feed_lamps_A[s] = r0[0] if is_left else r0[-1]
+                    elif edge_lamps:
+                        stripe_feed_lamps_A[s] = edge_lamps[0] if is_left else edge_lamps[-1]
+                    elif lamp_grid:
+                        stripe_feed_lamps_A[s] = next(iter(lamp_grid.values()))
 
         else: # VERTICAL MODES
             for s in range(num_stripes):
@@ -439,6 +451,10 @@ def compile_blueprint(
                     c0_top = [lamp_grid[(xs, y)] for y in range(h_top) if (xs, y) in lamp_grid]
                     if c0_top:
                         stripe_feed_lamps_A[s] = c0_top[0]
+                    elif topmost_lamps:
+                        stripe_feed_lamps_A[s] = topmost_lamps[0]
+                    elif lamp_grid:
+                        stripe_feed_lamps_A[s] = next(iter(lamp_grid.values()))
 
                     # Alt Blok: y in [h_top, height - 1]
                     for col_x in range(xs, xe):
@@ -473,6 +489,10 @@ def compile_blueprint(
                     c0_bottom = [lamp_grid[(xs, y)] for y in range(h_top, height) if (xs, y) in lamp_grid]
                     if c0_bottom:
                         stripe_feed_lamps_B[s] = c0_bottom[-1]
+                    elif bottommost_lamps:
+                        stripe_feed_lamps_B[s] = bottommost_lamps[-1]
+                    elif lamp_grid:
+                        stripe_feed_lamps_B[s] = next(iter(lamp_grid.values()))
 
                 else: # Tek dikey blok (üst veya alt)
                     for col_x in range(xs, xe):
@@ -507,6 +527,10 @@ def compile_blueprint(
                     col0 = [lamp_grid[(xs, y)] for y in range(height) if (xs, y) in lamp_grid]
                     if col0:
                         stripe_feed_lamps_A[s] = col0[-1] if is_bottom else col0[0]
+                    elif edge_lamps:
+                        stripe_feed_lamps_A[s] = edge_lamps[-1] if is_bottom else edge_lamps[0]
+                    elif lamp_grid:
+                        stripe_feed_lamps_A[s] = next(iter(lamp_grid.values()))
 
     # 2.1. Şerit Koordinat Haritalaması (Trafolar kombinatörlerin arasına girmesin, aradaki boşluklara/koridorlara girsin)
     sub_y_bands = [(float(ty), float(ty + 2.0)) for ty in y_coords]
@@ -600,8 +624,10 @@ def compile_blueprint(
                 if fill_all_rows:
                     stripe_cells_A = []
                     c = 0
-                    while len(stripe_cells_A) < total_frames:
+                    while len(stripe_cells_A) < total_frames and c < 5000:
                         rem_list = list(range(Hs)) if (c % 2 == 0) else list(reversed(range(Hs)))
+                        if not rem_list:
+                            break
                         for r in rem_list:
                             row_y = ys + r
                             x_pos = start_x_A + 3.0 * c
@@ -623,10 +649,10 @@ def compile_blueprint(
                     frame_data = frames[f_idx]
                     frame = frame_data if isinstance(frame_data, Image.Image) else _bytes_to_image(frame_data)
                     if fill_all_rows:
-                        xf, y_pos = stripe_cells_A[f_idx]
+                        xf, y_pos = stripe_cells_A[f_idx] if f_idx < len(stripe_cells_A) else (start_x_A + f_idx * 3.0, float(ys + 0.5))
                     else:
-                        y_pos = stripe_y_map[s]
-                        xf = pos_x_A[f_idx]
+                        y_pos = stripe_y_map.get(s, float(ys + 0.5))
+                        xf = pos_x_A[f_idx] if f_idx < len(pos_x_A) else (start_x_A + f_idx * 3.0)
                     filters = []
                     for py in range(ys, ye):
                         for px in range(x_start_p, width):
@@ -679,8 +705,10 @@ def compile_blueprint(
                 if fill_all_rows:
                     stripe_cells_B = []
                     c = 0
-                    while len(stripe_cells_B) < total_frames:
+                    while len(stripe_cells_B) < total_frames and c < 5000:
                         rem_list = list(range(Hs)) if (c % 2 == 0) else list(reversed(range(Hs)))
+                        if not rem_list:
+                            break
                         for r in rem_list:
                             row_y = ys + r
                             x_pos = start_x_B - 3.0 * c
@@ -702,10 +730,10 @@ def compile_blueprint(
                     frame_data = frames[f_idx]
                     frame = frame_data if isinstance(frame_data, Image.Image) else _bytes_to_image(frame_data)
                     if fill_all_rows:
-                        xf, y_pos = stripe_cells_B[f_idx]
+                        xf, y_pos = stripe_cells_B[f_idx] if f_idx < len(stripe_cells_B) else (start_x_B - f_idx * 3.0, float(ys + 0.5))
                     else:
-                        y_pos = stripe_y_map[s]
-                        xf = pos_x_B[f_idx]
+                        y_pos = stripe_y_map.get(s, float(ys + 0.5))
+                        xf = pos_x_B[f_idx] if f_idx < len(pos_x_B) else (start_x_B - f_idx * 3.0)
                     filters = []
                     for py in range(ys, ye):
                         for px in range(0, x_end_p):
@@ -776,8 +804,10 @@ def compile_blueprint(
                 if fill_all_rows:
                     stripe_cells_A = []
                     r_idx = 0
-                    while len(stripe_cells_A) < total_frames:
+                    while len(stripe_cells_A) < total_frames and r_idx < 5000:
                         rem_list = list(range(Ws)) if (r_idx % 2 == 0) else list(reversed(range(Ws)))
+                        if not rem_list:
+                            break
                         for c_idx in rem_list:
                             col_x = xs + c_idx
                             y_pos = start_y_A - 3.0 * r_idx
@@ -799,10 +829,10 @@ def compile_blueprint(
                     frame_data = frames[f_idx]
                     frame = frame_data if isinstance(frame_data, Image.Image) else _bytes_to_image(frame_data)
                     if fill_all_rows:
-                        x_pos, yf = stripe_cells_A[f_idx]
+                        x_pos, yf = stripe_cells_A[f_idx] if f_idx < len(stripe_cells_A) else (float(xs + 0.5), start_y_A - f_idx * 3.0)
                     else:
-                        x_pos = stripe_x_map[s]
-                        yf = pos_y_A[f_idx]
+                        x_pos = stripe_x_map.get(s, float(xs + 0.5))
+                        yf = pos_y_A[f_idx] if f_idx < len(pos_y_A) else (start_y_A - f_idx * 3.0)
                     filters = []
                     for px in range(xs, xe):
                         for py in range(0, y_end_p):
@@ -855,8 +885,10 @@ def compile_blueprint(
                 if fill_all_rows:
                     stripe_cells_B = []
                     r_idx = 0
-                    while len(stripe_cells_B) < total_frames:
+                    while len(stripe_cells_B) < total_frames and r_idx < 5000:
                         rem_list = list(range(Ws)) if (r_idx % 2 == 0) else list(reversed(range(Ws)))
+                        if not rem_list:
+                            break
                         for c_idx in rem_list:
                             col_x = xs + c_idx
                             y_pos = start_y_B + 3.0 * r_idx
@@ -878,10 +910,10 @@ def compile_blueprint(
                     frame_data = frames[f_idx]
                     frame = frame_data if isinstance(frame_data, Image.Image) else _bytes_to_image(frame_data)
                     if fill_all_rows:
-                        x_pos, yf = stripe_cells_B[f_idx]
+                        x_pos, yf = stripe_cells_B[f_idx] if f_idx < len(stripe_cells_B) else (float(xs + 0.5), start_y_B + f_idx * 3.0)
                     else:
-                        x_pos = stripe_x_map[s]
-                        yf = pos_y_B[f_idx]
+                        x_pos = stripe_x_map.get(s, float(xs + 0.5))
+                        yf = pos_y_B[f_idx] if f_idx < len(pos_y_B) else (start_y_B + f_idx * 3.0)
                     filters = []
                     for px in range(xs, xe):
                         for py in range(y_start_p, height):

@@ -19,6 +19,11 @@ import socket
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from typing import Dict, Any, List
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 # Ensure project root is in sys.path
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if BASE_DIR not in sys.path:
@@ -34,7 +39,8 @@ from core.circuit_engine_v3 import compile_blueprint_v3, MAX_PIXELS_PER_STRIPE
 from core.circuit_engine_v2 import compile_blueprint_v2
 from core.circuit_engine import compile_blueprint as compile_blueprint_v1
 
-WWWROOT_DIR = os.path.join(BASE_DIR, "FactorioVideoToBlueprint", "wwwroot")
+_v2f_dir = os.path.join(BASE_DIR, "VideoToFactorioBlueprint", "wwwroot")
+WWWROOT_DIR = _v2f_dir if os.path.exists(_v2f_dir) else os.path.join(BASE_DIR, "FactorioVideoToBlueprint", "wwwroot")
 ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 
 active_compile_aborted = False
@@ -204,13 +210,15 @@ class CrossPlatformHandler(SimpleHTTPRequestHandler):
             num_lamps = calc_w * target_h
             
             engine = p.get("engine", "v3")
-            rom_dir = p.get("rom_direction", "horizontal")
-            rom_placement = p.get("rom_placement", "horizontal_right")
+            rom_mode = p.get("rom_mode") or p.get("rom_placement") or "horizontal_right"
+            rom_dir = p.get("rom_direction") or ("vertical" if rom_mode.startswith("vertical") else "horizontal")
             compact_rom = bool(p.get("compact_rom", True))
             fill_all_rows = bool(p.get("fill_all_rows", True))
             sub_quality = p.get("substation_quality", "legendary")
-            num_parts = int(p.get("num_parts", 1))
+            num_parts = max(1, int(p.get("num_parts", 1)))
             total_frames = int(p.get("total_frames", 16))
+            fps = float(p.get("fps", 5))
+            safe_fps = max(1, min(60, int(round(fps))))
 
             frames_per_pack = 16 if engine == "v3" else (3 if engine == "v2" else 1)
             num_packs = (total_frames + frames_per_pack - 1) // frames_per_pack
@@ -238,15 +246,22 @@ class CrossPlatformHandler(SimpleHTTPRequestHandler):
 
             self.send_json_response({
                 "success": True,
+                "width": calc_w,
                 "calc_width": calc_w,
+                "height": target_h,
                 "calc_height": target_h,
+                "lamps": num_lamps,
                 "monitor_lamps": num_lamps,
+                "total_frames": total_frames,
+                "fps": safe_fps,
+                "rom_mode": rom_mode,
                 "num_stripes": num_stripes,
                 "total_packs": num_packs,
                 "frames_per_pack": frames_per_pack,
                 "total_combinators": total_combs,
-                "num_parts": num_parts,
-                "part_combinators": part_combs
+                "combs_per_part": part_combs,
+                "part_combinators": part_combs,
+                "num_parts": num_parts
             })
         except Exception as e:
             self.send_json_response({"success": False, "error": str(e)}, status=500)
@@ -275,23 +290,24 @@ class CrossPlatformHandler(SimpleHTTPRequestHandler):
             orig_w = int(p.get("orig_w") or 16)
             orig_h = int(p.get("orig_h") or 16)
             fps = float(p.get("fps", 5))
+            safe_fps = max(1, min(60, int(round(fps))))
             max_frames = int(p.get("max_frames", 16))
             engine = p.get("engine", "v3")
-            rom_dir = p.get("rom_direction", "horizontal")
-            rom_placement = p.get("rom_placement", "horizontal_right")
+            rom_mode = p.get("rom_mode") or p.get("rom_placement") or "horizontal_right"
+            rom_dir = p.get("rom_direction") or ("vertical" if rom_mode.startswith("vertical") else "horizontal")
             compact_rom = bool(p.get("compact_rom", True))
             fill_all_rows = bool(p.get("fill_all_rows", True))
             sub_quality = p.get("substation_quality", "legendary")
-            num_parts = int(p.get("num_parts", 1))
+            num_parts = max(1, int(p.get("num_parts", 1)))
 
             calc_w = max(1, int(round(target_h * (orig_w / max(1, orig_h)))))
 
             # Extract frames
-            stream_msg({"type": "progress", "msg": f"Extracting frames for {calc_w}x{target_h}...", "fraction": 0.15})
+            stream_msg({"type": "progress", "msg": f"Extracting frames for {calc_w}x{target_h} ({safe_fps} FPS)...", "fraction": 0.15})
             if video_path == "__demo__":
-                frames = generate_procedural_demo(calc_w, target_h, num_frames=min(16, max_frames))
+                frames = generate_procedural_demo(calc_w, target_h, num_frames=max_frames, fps=safe_fps)
             else:
-                frames = extract_video_frames(video_path, calc_w, target_h, max_frames=max_frames)
+                frames = extract_video_frames(video_path, calc_w, target_h, target_fps=safe_fps, max_frames=max_frames)
 
             if not frames:
                 stream_msg({"type": "error", "error": "No frames could be extracted from media source."})
@@ -301,7 +317,7 @@ class CrossPlatformHandler(SimpleHTTPRequestHandler):
                 stream_msg({"type": "aborted", "msg": "Compilation aborted by user."})
                 return
 
-            stream_msg({"type": "progress", "msg": f"Compiling circuit blueprint ({len(frames)} frames)...", "fraction": 0.60})
+            stream_msg({"type": "progress", "msg": f"Compiling circuit blueprint ({len(frames)} frames @ {safe_fps} FPS)...", "fraction": 0.60})
 
             # Compile according to selected engine and slice parts
             for p_idx in range(num_parts):
@@ -316,8 +332,8 @@ class CrossPlatformHandler(SimpleHTTPRequestHandler):
                 })
 
                 compile_kwargs = {
-                    "fps": fps,
-                    "rom_mode": rom_placement,
+                    "fps": safe_fps,
+                    "rom_mode": rom_mode,
                     "part_idx": p_idx,
                     "num_parts": num_parts,
                     "copy_convenience": True,

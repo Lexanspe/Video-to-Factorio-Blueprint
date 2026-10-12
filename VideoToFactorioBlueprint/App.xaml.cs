@@ -1,8 +1,8 @@
-﻿using System.Configuration;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 
-namespace FactorioVideoToBlueprint;
+namespace VideoToFactorioBlueprint;
 
 /// <summary>
 /// Interaction logic for App.xaml

@@ -70,7 +70,7 @@ the top-left substation occupies the tile rectangle $[-2, 0) \times [-2, 0)$. Th
 ### 4.2. Global Bounding Box & Expansion Loops
 The grid stepping algorithm first estimates the maximum horizontal and vertical bounding coordinates, factoring in display dimensions, ROM lane count, and curled layout spans:
 
-$$\text{comb\_span} = \text{cols\_est} \times 4.0 + \left(\frac{\text{cols\_est} \times 4.0}{\text{step}}\right) \times 2.0 + 30.0$$
+$$\text{CombSpan} = \text{cols} \times 4.0 + \left(\frac{\text{cols} \times 4.0}{\text{step}}\right) \times 2.0 + 30.0$$
 
 The grid generator steps outwards in both negative and positive directions:
 
@@ -88,14 +88,14 @@ The grid generator steps outwards in both negative and positive directions:
        x_coords.append(cx)
        cx += step
    ```
-   *(where $\text{half\_reach} = \lfloor \text{step} / 2 \rfloor$)*
+   *(where $\text{HalfReach} = \lfloor \text{step} / 2 \rfloor$)*
 
 3. **Substation Coordinate List:**
-   $$\text{substations\_list} = \{ (tx, ty) \mid tx \in x_{coords}, \ ty \in y_{coords} \}$$
+   $$\text{SubstationsList} = \{ (tx, ty) \mid tx \in x_{coords}, \ ty \in y_{coords} \}$$
 
 ### 4.3. Lamp-Substation Collision Masking
 If a substation overlaps the active display matrix in embedded layout modes, the engine masks off those exact four tiles:
-$$\text{occupied\_lamp\_tiles} = \{ (px, py) \mid px \in [tx, tx+1], \ py \in [ty, ty+1], \ 0 \le px < W, \ 0 \le py < H \}$$
+$$\text{OccupiedLampTiles} = \{ (px, py) \mid px \in [tx, tx+1], \ py \in [ty, ty+1], \ 0 \le px < W, \ 0 \le py < H \}$$
 Lamps are never placed at these coordinates, preventing entity collision errors during blueprint import.
 
 ---
@@ -213,7 +213,7 @@ olarak seçilir. Böylece en sol üstteki trafo $[-2, 0) \times [-2, 0)$ karo ar
 ### 4.2. Küresel Sınır Kutusu ve Genişleme Döngüleri
 Izgara algoritması ekran boyutlarını, ROM satır sayısını ve kıvrımlı hat genişliklerini hesaba katarak kapsanması gereken en uç koordinatları belirler:
 
-$$\text{comb\_span} = \text{cols\_est} \times 4.0 + \left(\frac{\text{cols\_est} \times 4.0}{\text{step}}\right) \times 2.0 + 30.0$$
+$$\text{CombSpan} = \text{cols} \times 4.0 + \left(\frac{\text{cols} \times 4.0}{\text{step}}\right) \times 2.0 + 30.0$$
 
 Izgara oluşturucu hem negatif hem de pozitif yönde dinamik adımlarla ilerler:
 
@@ -231,14 +231,14 @@ Izgara oluşturucu hem negatif hem de pozitif yönde dinamik adımlarla ilerler:
        x_coords.append(cx)
        cx += step
    ```
-   *(Burada $\text{half\_reach} = \lfloor \text{step} / 2 \rfloor$)*
+   *(Burada $\text{HalfReach} = \lfloor \text{step} / 2 \rfloor$)*
 
 3. **Trafo Koordinat Kümesi:**
-   $$\text{substations\_list} = \{ (tx, ty) \mid tx \in x_{coords}, \ ty \in y_{coords} \}$$
+   $$\text{SubstationsList} = \{ (tx, ty) \mid tx \in x_{coords}, \ ty \in y_{coords} \}$$
 
 ### 4.3. Lamba-Trafo Çakışma Maskelemesi
 Trafoların ekranın aktif yüzeyine denk geldiği gömülü modlarda motor, bu 4 karoyu maskeleyerek lamba yerleşiminden hariç tutar:
-$$\text{occupied\_lamp\_tiles} = \{ (px, py) \mid px \in [tx, tx+1], \ py \in [ty, ty+1], \ 0 \le px < W, \ 0 \le py < H \}$$
+$$\text{OccupiedLampTiles} = \{ (px, py) \mid px \in [tx, tx+1], \ py \in [ty, ty+1], \ 0 \le px < W, \ 0 \le py < H \}$$
 Bu koordinatlarda lamba oluşturulmaz; böylece Factorio'da blueprint basılırken varlık çakışma (collision) hataları engellenir.
 
 ---

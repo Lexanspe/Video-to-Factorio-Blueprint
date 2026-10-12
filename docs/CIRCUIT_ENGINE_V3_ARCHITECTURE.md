@@ -30,7 +30,7 @@ RGB colors are converted to grayscale using the standard ITU-R BT.601 luma formu
 
 $$Y = \frac{299 \cdot R + 587 \cdot G + 114 \cdot B}{1000}$$
 
-$$\text{level\_2bit} = \min\left(3, \max\left(0, \left\lfloor \frac{Y \cdot 3 + 127}{255} \right\rfloor \right)\right)$$
+$$\text{Level2Bit} = \min\left(3, \max\left(0, \left\lfloor \frac{Y \cdot 3 + 127}{255} \right\rfloor \right)\right)$$
 
 | Level (2-bit) | Representation | 8-Bit Grayscale | Hex Value | Color |
 | :---: | :---: | :---: | :---: | :---: |
@@ -50,7 +50,8 @@ Shift:   30   |  28   | ... |   4    |   2    |   0
 ```
 
 $$\text{Shift}(k) = 2 \times k \quad (k \in [0, 15] \rightarrow 0, 2, 4, \dots, 30)$$
-$$\text{Value} = \sum_{k=0}^{15} \left( v_k \ \& \ 3 \right) \ll (2 \times k)$$
+$$\text{Value} = \sum_{k=0}^{15} \left( (v_k \operatorname{AND} 3) \times 2^{2k} \right)$$
+*(Bitwise logic: `Value = (v_0 & 3) | ((v_1 & 3) << 2) | ... | ((v_15 & 3) << 30)`)*
 
 When bit 31 is set, Python converts the value to a signed 32-bit integer compatible with Factorio:
 ```python
@@ -65,28 +66,28 @@ if val >= 0x80000000:
 ```mermaid
 graph TD
     subgraph Clock["Central Master Clock (Selector Clock)"]
-        CC_TICK["CC (signal-C = 1)"] -->|Green Wire| DEC_TICK["Decider: C < TotalTicks -> C"]
-        DEC_TICK -->|Feedback: Green Wire| DEC_TICK
-        DEC_TICK -->|Green Wire (signal-C)| ARITH_F["Arithmetic: C / TicksPerFrame = F (Frame Index)"]
-        ARITH_F -->|Red Wire| ARITH_PACK["Arithmetic: F / 16 = P (Pack Index)"]
-        ARITH_F -->|Red Wire| ARITH_K["Arithmetic: F % 16 = k (Sub-frame)"]
-        ARITH_K -->|Green Wire| ARITH_S["Arithmetic: k * 2 = S (Shift Amount: 0..30)"]
+        CC_TICK["CC (signal-C = 1)"] -->|"Green Wire"| DEC_TICK["Decider: C < TotalTicks -> C"]
+        DEC_TICK -->|"Feedback: Green Wire"| DEC_TICK
+        DEC_TICK -->|"Green Wire (signal-C)"| ARITH_F["Arithmetic: C / TicksPerFrame = F (Frame Index)"]
+        ARITH_F -->|"Red Wire"| ARITH_PACK["Arithmetic: F / 16 = P (Pack Index)"]
+        ARITH_F -->|"Red Wire"| ARITH_K["Arithmetic: F % 16 = k (Sub-frame)"]
+        ARITH_K -->|"Green Wire"| ARITH_S["Arithmetic: k * 2 = S (Shift Amount: 0..30)"]
     end
 
     subgraph ROM_Packs["ROM Bank (16 Frames Per Pack)"]
-        CC_DATA["Constant Combinator (Packed Int32 Data)"] -->|Green Wire| DEC_ACT["Decider: P == PackIndex -> Output Each (Input Count)"]
+        CC_DATA["Constant Combinator (Packed Int32 Data)"] -->|"Green Wire"| DEC_ACT["Decider: P == PackIndex -> Output Each (Input Count)"]
     end
 
-    ARITH_PACK -->|Red Wire (Bus)| DEC_ACT
+    ARITH_PACK -->|"Red Wire (Bus)"| DEC_ACT
 
     subgraph Head_Decoder["Head-of-Stripe Centralized Decoder"]
-        DEC_ACT -->|Green Wire| ARITH_SHIFT["Arithmetic: Each >> S -> Each"]
-        ARITH_S -->|Red Wire| ARITH_SHIFT
-        ARITH_SHIFT -->|Green Wire| ARITH_MASK["Arithmetic: Each AND 3 -> Each"]
-        ARITH_MASK -->|Green Wire| ARITH_ADAPT["Arithmetic: Each * 5,592,405 -> Each"]
+        DEC_ACT -->|"Green Wire"| ARITH_SHIFT["Arithmetic: Each >> S -> Each"]
+        ARITH_S -->|"Red Wire"| ARITH_SHIFT
+        ARITH_SHIFT -->|"Green Wire"| ARITH_MASK["Arithmetic: Each AND 3 -> Each"]
+        ARITH_MASK -->|"Green Wire"| ARITH_ADAPT["Arithmetic: Each * 5,592,405 -> Each"]
     end
 
-    ARITH_ADAPT -->|Green Bus Wire| LAMPS["Monitor Lamps (Color Mode 2: Packed RGB)"]
+    ARITH_ADAPT -->|"Green Bus Wire"| LAMPS["Monitor Lamps (Color Mode 2: Packed RGB)"]
 ```
 
 ### 3.1. Single-Combinator TrueColor Multiplier (`* 5,592,405`)
@@ -125,7 +126,7 @@ RGB renkleri ITU-R BT.601 luma formülü ile gri tonlamaya dönüştürülür ve
 
 $$Y = \frac{299 \cdot R + 587 \cdot G + 114 \cdot B}{1000}$$
 
-$$\text{level\_2bit} = \min\left(3, \max\left(0, \left\lfloor \frac{Y \cdot 3 + 127}{255} \right\rfloor \right)\right)$$
+$$\text{Level2Bit} = \min\left(3, \max\left(0, \left\lfloor \frac{Y \cdot 3 + 127}{255} \right\rfloor \right)\right)$$
 
 | Seviye (2-bit) | Temsil | 8-Bit Karşılığı | Hex Değeri | Renk |
 | :---: | :---: | :---: | :---: | :---: |
@@ -145,7 +146,8 @@ Shift:   30   |  28   | ... |   4    |   2    |   0
 ```
 
 $$\text{Shift}(k) = 2 \times k \quad (k \in [0, 15] \rightarrow 0, 2, 4, \dots, 30)$$
-$$\text{Value} = \sum_{k=0}^{15} \left( v_k \ \& \ 3 \right) \ll (2 \times k)$$
+$$\text{Değer} = \sum_{k=0}^{15} \left( (v_k \operatorname{AND} 3) \times 2^{2k} \right)$$
+*(Bitsel mantık: `Değer = (v_0 & 3) | ((v_1 & 3) << 2) | ... | ((v_15 & 3) << 30)`)*
 
 Bit 31 set edildiğinde değer Factorio tarafından negatif 32-bit tamsayı olarak yorumlanır:
 ```python
@@ -160,28 +162,28 @@ if val >= 0x80000000:
 ```mermaid
 graph TD
     subgraph Clock["Merkezi Saat Devresi (Selector Clock)"]
-        CC_TICK["CC (signal-C = 1)"] -->|Yeşil Kablo| DEC_TICK["Decider: C < TotalTicks -> C"]
-        DEC_TICK -->|Geri Besleme: Yeşil Kablo| DEC_TICK
-        DEC_TICK -->|Yeşil Kablo (signal-C)| ARITH_F["Arithmetic: C / TicksPerFrame = F (Kare İndeksi)"]
-        ARITH_F -->|Kırmızı Kablo| ARITH_PACK["Arithmetic: F / 16 = P (Paket İndeksi)"]
-        ARITH_F -->|Kırmızı Kablo| ARITH_K["Arithmetic: F % 16 = k (Alt Kare)"]
-        ARITH_K -->|Yeşil Kablo| ARITH_S["Arithmetic: k * 2 = S (Shift Miktarı: 0..30)"]
+        CC_TICK["CC (signal-C = 1)"] -->|"Yeşil Kablo"| DEC_TICK["Decider: C < TotalTicks -> C"]
+        DEC_TICK -->|"Geri Besleme: Yeşil Kablo"| DEC_TICK
+        DEC_TICK -->|"Yeşil Kablo (signal-C)"| ARITH_F["Arithmetic: C / TicksPerFrame = F (Kare İndeksi)"]
+        ARITH_F -->|"Kırmızı Kablo"| ARITH_PACK["Arithmetic: F / 16 = P (Paket İndeksi)"]
+        ARITH_F -->|"Kırmızı Kablo"| ARITH_K["Arithmetic: F % 16 = k (Alt Kare)"]
+        ARITH_K -->|"Yeşil Kablo"| ARITH_S["Arithmetic: k * 2 = S (Shift Miktarı: 0..30)"]
     end
 
     subgraph ROM_Packs["ROM Bankası (16 Kare / Paket)"]
-        CC_DATA["Sabit Kombinatör (Paketli Int32 Verisi)"] -->|Yeşil Kablo| DEC_ACT["Decider: P == PackIndex -> Output Each (Input Count)"]
+        CC_DATA["Sabit Kombinatör (Paketli Int32 Verisi)"] -->|"Yeşil Kablo"| DEC_ACT["Decider: P == PackIndex -> Output Each (Input Count)"]
     end
 
-    ARITH_PACK -->|Kırmızı Kablo (Bus)| DEC_ACT
+    ARITH_PACK -->|"Kırmızı Kablo (Bus)"| DEC_ACT
 
     subgraph Head_Decoder["Şerit Başı Merkezi Dekoder"]
-        DEC_ACT -->|Yeşil Kablo| ARITH_SHIFT["Arithmetic: Each >> S -> Each"]
-        ARITH_S -->|Kırmızı Kablo| ARITH_SHIFT
-        ARITH_SHIFT -->|Yeşil Kablo| ARITH_MASK["Arithmetic: Each AND 3 -> Each"]
-        ARITH_MASK -->|Yeşil Kablo| ARITH_ADAPT["Arithmetic: Each * 5,592,405 -> Each"]
+        DEC_ACT -->|"Yeşil Kablo"| ARITH_SHIFT["Arithmetic: Each >> S -> Each"]
+        ARITH_S -->|"Kırmızı Kablo"| ARITH_SHIFT
+        ARITH_SHIFT -->|"Yeşil Kablo"| ARITH_MASK["Arithmetic: Each AND 3 -> Each"]
+        ARITH_MASK -->|"Yeşil Kablo"| ARITH_ADAPT["Arithmetic: Each * 5,592,405 -> Each"]
     end
 
-    ARITH_ADAPT -->|Yeşil Veri Yolu| LAMPS["Monitör Lambaları (Color Mode 2: Packed RGB)"]
+    ARITH_ADAPT -->|"Yeşil Veri Yolu"| LAMPS["Monitör Lambaları (Color Mode 2: Packed RGB)"]
 ```
 
 ### 3.1. Tek Kombinatörlük TrueColor Çarpanı (`* 5.592.405`)

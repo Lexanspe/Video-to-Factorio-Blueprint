@@ -6,6 +6,11 @@ import io
 import base64
 from typing import Dict, Any, List
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from core.video_processor import (
@@ -108,8 +113,9 @@ def cmd_estimate_stats(args: List[str]):
         target_h = int(p.get("target_h", 16))
         engine = p.get("engine", "v3")
         fps = int(p.get("fps", 5))
+        safe_fps = max(1, min(60, int(round(fps))))
         total_frames = int(p.get("total_frames", 16))
-        rom_mode = p.get("rom_mode", "horizontal_right")
+        rom_mode = p.get("rom_mode") or p.get("rom_placement") or "horizontal_right"
         num_parts = max(1, int(p.get("num_parts", 1)))
         compact_rom = bool(p.get("compact_rom", True))
         fill_all_rows = bool(p.get("fill_all_rows", True))
@@ -172,13 +178,19 @@ def cmd_estimate_stats(args: List[str]):
         res = {
             "success": True,
             "width": w,
+            "calc_width": w,
             "height": h,
+            "calc_height": h,
             "lamps": lamps_count,
+            "monitor_lamps": lamps_count,
             "total_frames": total_frames,
+            "fps": safe_fps,
+            "rom_mode": rom_mode,
             "total_packs": total_packs,
             "num_stripes": num_stripes,
             "total_combinators": total_combs,
             "combs_per_part": combs_per_part,
+            "part_combinators": combs_per_part,
             "num_parts": num_parts
         }
         print(json.dumps(res))
@@ -206,9 +218,10 @@ def cmd_compile(args: List[str]):
                 pass
                 
         fps = int(p.get("fps", 5))
+        safe_fps = max(1, min(60, int(round(fps))))
         max_frames = p.get("max_frames", None)
         engine = p.get("engine", "v3")
-        rom_mode = p.get("rom_mode", "horizontal_right")
+        rom_mode = p.get("rom_mode") or p.get("rom_placement") or "horizontal_right"
         part_idx = int(p.get("part_idx", 0))
         num_parts = max(1, int(p.get("num_parts", 1)))
         compact_rom = bool(p.get("compact_rom", True))
@@ -224,10 +237,10 @@ def cmd_compile(args: List[str]):
         progress_cb("Kareler ayıklanıyor...", 0.05)
         
         if not video_path or video_path == "__demo__":
-            frames = generate_procedural_demo(calc_w, target_h, num_frames=max_frames or 16)
+            frames = generate_procedural_demo(calc_w, target_h, fps=safe_fps, num_frames=max_frames)
         else:
             frames = extract_video_frames(
-                video_path, calc_w, target_h, target_fps=fps,
+                video_path, calc_w, target_h, target_fps=safe_fps,
                 max_frames=max_frames,
                 progress_callback=lambda cur, tot: progress_cb(f"Kare ayıklanıyor ({cur}/{tot})...", 0.05 + 0.25 * (cur / max(1, tot)))
             )
@@ -235,7 +248,7 @@ def cmd_compile(args: List[str]):
         progress_cb("Blueprint derleniyor...", 0.35)
         
         compile_kwargs = {
-            "fps": fps,
+            "fps": safe_fps,
             "rom_mode": rom_mode,
             "part_idx": part_idx,
             "num_parts": num_parts,

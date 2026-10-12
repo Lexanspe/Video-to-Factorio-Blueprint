@@ -74,7 +74,7 @@ In Factorio 2.0, display lamps follow this standardized blueprint structure:
    Enables dynamic circuit network color control for the lamp.
 4. **`color_mode: 2` (Packed RGB)**:
    Instructs the lamp to decode a single 24-bit integer into full RGB channels:
-   $$\text{packed\_rgb} = (R \ll 16) \mid (G \ll 8) \mid B$$
+   $$\text{PackedRGB} = (R \ll 16) \mid (G \ll 8) \mid B$$
 5. **`rgb_signal` (`{"type": str, "name": str, "quality": str}`)**:
    The specific signal filter assigned to this lamp. On a shared green trunk bus carrying thousands of packed signals simultaneously, each lamp filters and reads only the signal matching its assigned `name` and `quality` to display its respective pixel value.
 6. **Trunk Bus Routing**:
@@ -152,7 +152,7 @@ Factorio 2.0'da bir ekran lambası şu standart blueprint yapısına sahiptir:
    Lambanın renk kontrolünü devre ağına bağlar.
 4. **`color_mode: 2` (Packed RGB)**:
    Lambaya gelen 32-bit işaretli tamsayıyı 24-bit RGB bileşenlerine çözmesini söyler:
-   $$\text{packed\_rgb} = (R \ll 16) \mid (G \ll 8) \mid B$$
+   $$\text{PaketliRGB} = (R \ll 16) \mid (G \ll 8) \mid B$$
 5. **`rgb_signal` (`{"type": str, "name": str, "quality": str}`)**:
    Bu lambaya özel olarak atanmış sinyal filtresidir. Ortak yeşil veri yolu üzerinde aynı anda taşınan binlerce paketli sinyal arasından, her lamba yalnızca kendi adına ve kalitesine eşleşen sinyali dinleyerek doğru piksel rengini görüntüler.
 6. **Veri Yolu Kablolaması (Trunk Bus)**:

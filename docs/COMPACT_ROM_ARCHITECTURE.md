@@ -25,9 +25,9 @@ When constructing large-scale animated displays in Factorio, two physical constr
 
 Rather than skipping entire memory rows or crudely shifting entire memory banks when colliding with a substation, our layout engine performs **micro-level continuous collision clearance**:
 
-1. **Row Assignment:** Each frame packet $u$ in a stripe is mapped to a target row $row\_y$ with vertical center $y\_pos = row\_y + 0.5$.
+1. **Row Assignment:** Each frame packet $u$ in a stripe is mapped to a target row `row_y` with vertical center $y_{\text{pos}} = \text{row}_y + 0.5$.
 2. **Substation Query:** All substations overlapping the current row are queried:
-   $$\text{row\_subs} = \{ \text{sub} \mid \text{sub.ty} \le y\_pos < \text{sub.ty} + 2.0 \}$$
+   $$\text{RowSubs} = \{ \text{sub} \mid \text{sub.ty} \le y_{\text{pos}} < \text{sub.ty} + 2.0 \}$$
 3. **Interval Intersection Rule:**
    Let the combinator occupy the 1D horizontal interval $[x, x + w)$, where $w$ is its physical width ($1.0$ for Constant Combinators, $2.0$ for Decider/Arithmetic Combinators).
    Let the substation occupy the interval $[st, en) = [tx, tx + 2.0)$, where $tx$ is the substation's left coordinate.
@@ -89,9 +89,9 @@ Factorio'da büyük boyutlu video ekranları inşa edilirken iki kritik fiziksel
 
 Trafolarla karşılaşıldığında tüm satır atlanmaz veya kaba blok kaydırması yapılmaz; kaydırma işlemi kombinatör bazında mikro düzeyde gerçekleştirilir:
 
-1. **Satır Belirleme:** Şeritteki her kare paketi $u$ için satır $row\_y$ ve $y\_pos = row\_y + 0.5$ belirlenir.
+1. **Satır Belirleme:** Şeritteki her kare paketi $u$ için satır `row_y` ve $y_{\text{pos}} = \text{row}_y + 0.5$ belirlenir.
 2. **Trafo Taraması:** O satırın üzerinden geçen tüm trafolar filtrelenir:
-   $$\text{row\_subs} = \{ \text{sub} \mid \text{sub.ty} \le y\_pos < \text{sub.ty} + 2.0 \}$$
+   $$\text{RowSubs} = \{ \text{sub} \mid \text{sub.ty} \le y_{\text{pos}} < \text{sub.ty} + 2.0 \}$$
 3. **Aralık Kesişim Kuralı:**
    Kombinatörün yatay düzlemdeki aralığı $[x, x + w)$ olsun ($w$: Sabit Kombinatör için $1.0$, Karar/Aritmetik için $2.0$ karo).
    Trafonun yatay düzlemdeki aralığı $[st, en) = [tx, tx + 2.0)$ olsun.

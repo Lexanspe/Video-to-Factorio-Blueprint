@@ -18,29 +18,29 @@ Engine V1 is the zero-compromise engine for maximum color fidelity. Every frame 
 * **Master Clock:** Emits `signal-F` (Frame Index), counting periodically from `0` to `total_frames - 1`.
 * **ROM Storage:** 1 Constant Combinator + 1 Decider Combinator per frame.
 * **Color Depth:** 24-bit direct TrueColor packed integer:
-  $$\text{packed\_rgb} = (R \ll 16) \mid (G \ll 8) \mid B$$
+  $$\text{PackedRGB} = (R \ll 16) \mid (G \ll 8) \mid B$$
 * **Display Bus:** Green wire trunk lines carrying up to **13,008 unique signals** (2,168 items $\times$ 6 qualities).
 * **Decoders:** 0 combinators needed (direct lamp readout).
 
 ```mermaid
 graph TD
     subgraph Clock["Master Clock Circuit"]
-        CC_CLK["CC (signal-C = 1)"] -->|Green Wire| DEC_CLK["Decider (C < Limit -> C)"]
-        DEC_CLK -->|Feedback: Green Wire| DEC_CLK
-        DEC_CLK -->|Green Wire (signal-C)| ARITH_CLK["Arithmetic (C / TicksPerFrame = signal-F)"]
+        CC_CLK["CC (signal-C = 1)"] -->|"Green Wire"| DEC_CLK["Decider (C < Limit -> C)"]
+        DEC_CLK -->|"Feedback: Green Wire"| DEC_CLK
+        DEC_CLK -->|"Green Wire (signal-C)"| ARITH_CLK["Arithmetic (C / TicksPerFrame = signal-F)"]
     end
 
-    ARITH_CLK -->|Red Wire Bus| DEC_0["Decider 0 (F == 0)"]
-    ARITH_CLK -->|Red Wire Bus| DEC_1["Decider 1 (F == 1)"]
-    ARITH_CLK -->|Red Wire Bus| DEC_N["Decider N (F == N)"]
+    ARITH_CLK -->|"Red Wire Bus"| DEC_0["Decider 0 (F == 0)"]
+    ARITH_CLK -->|"Red Wire Bus"| DEC_1["Decider 1 (F == 1)"]
+    ARITH_CLK -->|"Red Wire Bus"| DEC_N["Decider N (F == N)"]
 
-    CONST_0["CC 0 (Frame 0 Data)"] -->|Green Wire| DEC_0
-    CONST_1["CC 1 (Frame 1 Data)"] -->|Green Wire| DEC_1
-    CONST_N["CC N (Frame N Data)"] -->|Green Wire| DEC_N
+    CONST_0["CC 0 (Frame 0 Data)"] -->|"Green Wire"| DEC_0
+    CONST_1["CC 1 (Frame 1 Data)"] -->|"Green Wire"| DEC_1
+    CONST_N["CC N (Frame N Data)"] -->|"Green Wire"| DEC_N
 
-    DEC_0 -->|Green Bus| MONITOR["Display Lamps (Direct TrueColor)"]
-    DEC_1 -->|Green Bus| MONITOR
-    DEC_N -->|Green Bus| MONITOR
+    DEC_0 -->|"Green Bus"| MONITOR["Display Lamps (Direct TrueColor)"]
+    DEC_1 -->|"Green Bus"| MONITOR
+    DEC_N -->|"Green Bus"| MONITOR
 ```
 
 ---
@@ -75,28 +75,28 @@ Engine V2 provides color video playback while achieving a 3x reduction in Consta
 graph TD
     subgraph ROM_Pack["V2 ROM Pack (7 Entities / 13.0 Tiles)"]
         CC["Constant Combinator (Packed 3-Frame Data)"]
-        CC -->|Green Wire| D2["Decider F == f+2"]
-        D2 -->|Green Wire| D1["Decider F == f+1"]
-        D1 -->|Green Wire| D0["Decider F == f"]
+        CC -->|"Green Wire"| D2["Decider F == f+2"]
+        D2 -->|"Green Wire"| D1["Decider F == f+1"]
+        D1 -->|"Green Wire"| D0["Decider F == f"]
 
-        D0 -->|Green Wire| S0["Arithmetic (>> 18)"]
-        D1 -->|Green Wire| S1["Arithmetic (>> 9)"]
-        D2 -->|Green Wire| S2["Arithmetic (* 1)"]
+        D0 -->|"Green Wire"| S0["Arithmetic (>> 18)"]
+        D1 -->|"Green Wire"| S1["Arithmetic (>> 9)"]
+        D2 -->|"Green Wire"| S2["Arithmetic (* 1)"]
     end
 
-    S0 -->|Direct Green Output Bus| ADAPTER
-    S1 -->|Direct Green Output Bus| ADAPTER
-    S2 -->|Direct Green Output Bus| ADAPTER
+    S0 -->|"Direct Green Output Bus"| ADAPTER
+    S1 -->|"Direct Green Output Bus"| ADAPTER
+    S2 -->|"Direct Green Output Bus"| ADAPTER
 
     subgraph ADAPTER["TrueColor Adapter (12 Combinators / 4 Stages / 4 Ticks)"]
-        STAGE1["Stage 1: AND 448 (Red) | AND 56 (Green) | AND 7 (Blue)"]
-        STAGE2["Stage 2: >> 6 (Red) | >> 3 (Green) | * 36 (Blue)"]
-        STAGE3["Stage 3: * 36 (Red) | * 36 (Green) | * 1 (Blue)"]
-        STAGE4["Stage 4: << 16 (Red) | << 8 (Green) | * 1 (Blue)"]
+        STAGE1["Stage 1: AND 448 (Red), AND 56 (Green), AND 7 (Blue)"]
+        STAGE2["Stage 2: >> 6 (Red), >> 3 (Green), * 36 (Blue)"]
+        STAGE3["Stage 3: * 36 (Red), * 36 (Green), * 1 (Blue)"]
+        STAGE4["Stage 4: << 16 (Red), << 8 (Green), * 1 (Blue)"]
         STAGE1 --> STAGE2 --> STAGE3 --> STAGE4
     end
 
-    STAGE4 -->|Green Wire Bus| MONITOR["Display Lamps (24-bit RGB)"]
+    STAGE4 -->|"Green Wire Bus"| MONITOR["Display Lamps (24-bit RGB)"]
 ```
 
 ---
@@ -130,29 +130,29 @@ Motor V1, sıfır renk kaybı ve doğrudan renk doğruluğu isteyen durumlar iç
 * **Merkezi Saat:** `signal-F` (Kare İndeksi), `0`'dan `total_frames - 1`'e kadar periyodik sayar.
 * **ROM Depolama:** Kare başına 1 Sabit Kombinatör + 1 Karar Kombinatörü.
 * **Renk Derinliği:** 24-bit doğrudan TrueColor paketli tamsayı:
-  $$\text{packed\_rgb} = (R \ll 16) \mid (G \ll 8) \mid B$$
+  $$\text{PaketliRGB} = (R \ll 16) \mid (G \ll 8) \mid B$$
 * **Veri Yolu (Display Bus):** 2.168 sinyal $\times$ 6 kalite sayesinde şerit başına **13.008 piksel** kapasite.
 * **Dekoder İhtiyacı:** Sıfır (lambalar doğrudan veri yolundaki rengi okur).
 
 ```mermaid
 graph TD
     subgraph Clock["Merkezi Saat Devresi"]
-        CC_CLK["CC (signal-C = 1)"] -->|Yeşil Kablo| DEC_CLK["Decider (C < Limit -> C)"]
-        DEC_CLK -->|Geri Besleme: Yeşil Kablo| DEC_CLK
-        DEC_CLK -->|Yeşil Kablo (signal-C)| ARITH_CLK["Arithmetic (C / TicksPerFrame = signal-F)"]
+        CC_CLK["CC (signal-C = 1)"] -->|"Yeşil Kablo"| DEC_CLK["Decider (C < Limit -> C)"]
+        DEC_CLK -->|"Geri Besleme: Yeşil Kablo"| DEC_CLK
+        DEC_CLK -->|"Yeşil Kablo (signal-C)"| ARITH_CLK["Aritmetik (C / TicksPerFrame = signal-F)"]
     end
 
-    ARITH_CLK -->|Kırmızı Kablo Veri Yolu| DEC_0["Decider 0 (F == 0)"]
-    ARITH_CLK -->|Kırmızı Kablo Veri Yolu| DEC_1["Decider 1 (F == 1)"]
-    ARITH_CLK -->|Kırmızı Kablo Veri Yolu| DEC_N["Decider N (F == N)"]
+    ARITH_CLK -->|"Kırmızı Kablo Veri Yolu"| DEC_0["Decider 0 (F == 0)"]
+    ARITH_CLK -->|"Kırmızı Kablo Veri Yolu"| DEC_1["Decider 1 (F == 1)"]
+    ARITH_CLK -->|"Kırmızı Kablo Veri Yolu"| DEC_N["Decider N (F == N)"]
 
-    CONST_0["CC 0 (Kare 0 Verisi)"] -->|Yeşil Kablo| DEC_0
-    CONST_1["CC 1 (Kare 1 Verisi)"] -->|Yeşil Kablo| DEC_1
-    CONST_N["CC N (Kare N Verisi)"] -->|Yeşil Kablo| DEC_N
+    CONST_0["CC 0 (Kare 0 Verisi)"] -->|"Yeşil Kablo"| DEC_0
+    CONST_1["CC 1 (Kare 1 Verisi)"] -->|"Yeşil Kablo"| DEC_1
+    CONST_N["CC N (Kare N Verisi)"] -->|"Yeşil Kablo"| DEC_N
 
-    DEC_0 -->|Yeşil Veri Yolu| MONITOR["Monitör Lambaları (Doğrudan TrueColor)"]
-    DEC_1 -->|Yeşil Veri Yolu| MONITOR
-    DEC_N -->|Yeşil Veri Yolu| MONITOR
+    DEC_0 -->|"Yeşil Veri Yolu"| MONITOR["Monitör Lambaları (Doğrudan TrueColor)"]
+    DEC_1 -->|"Yeşil Veri Yolu"| MONITOR
+    DEC_N -->|"Yeşil Veri Yolu"| MONITOR
 ```
 
 ---
@@ -163,7 +163,7 @@ Motor V2, renkli oynatımı korurken 3 kareyi tek bir 27-bit tamsayı içine sı
 
 * **Piksel Kodlama:** 9-bit RGB ($R_3 \ll 6 \mid G_3 \ll 3 \mid B_3$), her kanal 8 parlaklık seviyesine sahiptir ($0..7$).
 * **Paketleme:** 3 ardışık kare ($F_0, F_1, F_2$) 27-bitlik tamsayıya paketlenir:
-  $$\text{Değer} = (\text{Pix}_0 \ll 18) \mid (\text{Pix}_1 \ll 9) \mid \text{Pix}_2$$
+  $$\text{PaketliDeger} = (\text{Pix}_0 \ll 18) \mid (\text{Pix}_1 \ll 9) \mid \text{Pix}_2$$
 * **ROM Depolama:** 3 karelik paket başına 1 Sabit Kombinatör + 6 Kombinatör (3 Karar + 3 Kaydırıcı; toplam 7 varlık).
 * **Paket Genişliği:** Tam **13.0 karo** fiziksel genişlik (6 kombinatör $\times$ 2 karo + 1 CC $\times$ 1 karo = 13.0 karo; 15–19 karodan düşürüldü).
 * **Gereksiz `AND 511` Kombinatörünün Kaldırılması:**
@@ -187,28 +187,28 @@ Motor V2, renkli oynatımı korurken 3 kareyi tek bir 27-bit tamsayı içine sı
 graph TD
     subgraph ROM_Paketi["V2 ROM Paketi (7 Varlık / 13.0 Karo)"]
         CC["Sabit Kombinatör (3 Karelik Paketli Veri)"]
-        CC -->|Yeşil Kablo| D2["Karar F == f+2"]
-        D2 -->|Yeşil Kablo| D1["Karar F == f+1"]
-        D1 -->|Yeşil Kablo| D0["Karar F == f"]
+        CC -->|"Yeşil Kablo"| D2["Karar F == f+2"]
+        D2 -->|"Yeşil Kablo"| D1["Karar F == f+1"]
+        D1 -->|"Yeşil Kablo"| D0["Karar F == f"]
 
-        D0 -->|Yeşil Kablo| S0["Aritmetik (>> 18)"]
-        D1 -->|Yeşil Kablo| S1["Aritmetik (>> 9)"]
-        D2 -->|Yeşil Kablo| S2["Aritmetik (* 1)"]
+        D0 -->|"Yeşil Kablo"| S0["Aritmetik (>> 18)"]
+        D1 -->|"Yeşil Kablo"| S1["Aritmetik (>> 9)"]
+        D2 -->|"Yeşil Kablo"| S2["Aritmetik (* 1)"]
     end
 
-    S0 -->|Doğrudan Yeşil Çıkış Hattı| ADAPTOR
-    S1 -->|Doğrudan Yeşil Çıkış Hattı| ADAPTOR
-    S2 -->|Doğrudan Yeşil Çıkış Hattı| ADAPTOR
+    S0 -->|"Doğrudan Yeşil Çıkış Hattı"| ADAPTOR
+    S1 -->|"Doğrudan Yeşil Çıkış Hattı"| ADAPTOR
+    S2 -->|"Doğrudan Yeşil Çıkış Hattı"| ADAPTOR
 
     subgraph ADAPTOR["TrueColor Adaptör (12 Kombinatör / 4 Aşama / 4 Tick)"]
-        AS1["Aşama 1: AND 448 (Kırmızı) | AND 56 (Yeşil) | AND 7 (Mavi)"]
-        AS2["Aşama 2: >> 6 (Kırmızı) | >> 3 (Yeşil) | * 36 (Mavi)"]
-        AS3["Aşama 3: * 36 (Kırmızı) | * 36 (Yeşil) | * 1 (Mavi)"]
-        AS4["Aşama 4: << 16 (Kırmızı) | << 8 (Yeşil) | * 1 (Mavi)"]
+        AS1["Aşama 1: AND 448 (Kırmızı), AND 56 (Yeşil), AND 7 (Mavi)"]
+        AS2["Aşama 2: >> 6 (Kırmızı), >> 3 (Yeşil), * 36 (Mavi)"]
+        AS3["Aşama 3: * 36 (Kırmızı), * 36 (Yeşil), * 1 (Mavi)"]
+        AS4["Aşama 4: << 16 (Kırmızı), << 8 (Yeşil), * 1 (Mavi)"]
         AS1 --> AS2 --> AS3 --> AS4
     end
 
-    AS4 -->|Yeşil Kablo Veri Yolu| MONITOR["Monitör Lambaları (24-bit RGB)"]
+    AS4 -->|"Yeşil Kablo Veri Yolu"| MONITOR["Monitör Lambaları (24-bit RGB)"]
 ```
 
 ---

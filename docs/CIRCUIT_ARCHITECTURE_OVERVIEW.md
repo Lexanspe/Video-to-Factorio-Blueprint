@@ -92,9 +92,11 @@ Sixteen consecutive frames ($k \in [0, 15]$) are packed into a single 32-bit sig
 - 2-bit quantization ($0..3$):
   $$L = \min\left(3, \max\left(0, \left\lfloor \frac{Y \cdot 3 + 127}{255} \right\rfloor\right)\right)$$
 - 16-frame LSB-first bitwise packing:
-  $$\text{Value} = \sum_{k=0}^{15} (L_k \ \& \ 3) \ll (2 \times k)$$
+  $$\text{Value} = \sum_{k=0}^{15} \left( (L_k \operatorname{AND} 3) \times 2^{2k} \right)$$
+  *(Bitwise logic: `Value = (L_0 & 3) | ((L_1 & 3) << 2) | ... | ((L_15 & 3) << 30)`)*
 - Central Head-of-Stripe Decoder unpacks and converts values to 24-bit TrueColor via a single arithmetic multiplier:
-  $$\text{Decoded} = \left( (\text{Packed} \gg S) \ \& \ 3 \right) \times 5,592,405$$
+  $$\text{Decoded} = \left( (\text{Packed} \gg S) \operatorname{AND} 3 \right) \times 5{,}592{,}405$$
+  *(Bitwise logic: `Decoded = ((Packed >> S) & 3) * 5592405`)*
   - Level `0` $\rightarrow 0$ (`#000000` Black)
   - Level `1` $\rightarrow 5,592,405$ (`#555555` Dark Gray)
   - Level `2` $\rightarrow 11,184,810$ (`#AAAAAA` Light Gray)
@@ -227,9 +229,11 @@ On altı ardışık kare ($k \in [0, 15]$) tek bir 32-bit işaretli tamsayı iç
 - 2-bit kuantizasyon ($0..3$):
   $$L = \min\left(3, \max\left(0, \left\lfloor \frac{Y \cdot 3 + 127}{255} \right\rfloor\right)\right)$$
 - 16 karelik LSB öncelikli paketleme:
-  $$\text{Değer} = \sum_{k=0}^{15} (L_k \ \& \ 3) \ll (2 \times k)$$
+  $$\text{Değer} = \sum_{k=0}^{15} \left( (L_k \operatorname{AND} 3) \times 2^{2k} \right)$$
+  *(Bitsel mantık: `Değer = (L_0 & 3) | ((L_1 & 3) << 2) | ... | ((L_15 & 3) << 30)`)*
 - Şerit başındaki merkezi dekoder, tek bir aritmetik çarpan ile 2-bit değeri 24-bit TrueColor seviyesine uyarlar:
-  $$\text{Açılan} = \left( (\text{Paketli} \gg S) \ \& \ 3 \right) \times 5.592.405$$
+  $$\text{Açılan} = \left( (\text{Paketli} \gg S) \operatorname{AND} 3 \right) \times 5{,}592{,}405$$
+  *(Bitsel mantık: `Açılan = ((Paketli >> S) & 3) * 5592405`)*
   - Seviye `0` $\rightarrow 0$ (`#000000` Siyah)
   - Seviye `1` $\rightarrow 5.592.405$ (`#555555` Koyu Gri)
   - Seviye `2` $\rightarrow 11.184.810$ (`#AAAAAA` Açık Gri)

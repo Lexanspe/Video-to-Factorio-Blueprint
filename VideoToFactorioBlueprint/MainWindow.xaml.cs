@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
 
-namespace FactorioVideoToBlueprint
+namespace VideoToFactorioBlueprint
 {
     public partial class MainWindow : Window
     {
@@ -56,7 +56,7 @@ namespace FactorioVideoToBlueprint
                 // Initialize WebView2
                 string userDataFolder = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "FactorioVideoToBlueprint", "WebView2Data"
+                    "VideoToFactorioBlueprint", "WebView2Data"
                 );
                 Directory.CreateDirectory(userDataFolder);
 
