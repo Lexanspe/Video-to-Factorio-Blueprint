@@ -50,7 +50,7 @@ Shift:   30   |  28   | ... |   4    |   2    |   0
 ```
 
 $$\text{Shift}(k) = 2 \times k \quad (k \in [0, 15] \rightarrow 0, 2, 4, \dots, 30)$$
-$$\text{Value} = \sum_{k=0}^{15} \left( (v_k \operatorname{AND} 3) \times 2^{2k} \right)$$
+$$\text{Value} = \sum_{k=0}^{15} \left( (v_k \text{ AND } 3) \times 2^{2k} \right)$$
 *(Bitwise logic: `Value = (v_0 & 3) | ((v_1 & 3) << 2) | ... | ((v_15 & 3) << 30)`)*
 
 When bit 31 is set, Python converts the value to a signed 32-bit integer compatible with Factorio:
@@ -146,7 +146,7 @@ Shift:   30   |  28   | ... |   4    |   2    |   0
 ```
 
 $$\text{Shift}(k) = 2 \times k \quad (k \in [0, 15] \rightarrow 0, 2, 4, \dots, 30)$$
-$$\text{Değer} = \sum_{k=0}^{15} \left( (v_k \operatorname{AND} 3) \times 2^{2k} \right)$$
+$$\text{Deger} = \sum_{k=0}^{15} \left( (v_k \text{ AND } 3) \times 2^{2k} \right)$$
 *(Bitsel mantık: `Değer = (v_0 & 3) | ((v_1 & 3) << 2) | ... | ((v_15 & 3) << 30)`)*
 
 Bit 31 set edildiğinde değer Factorio tarafından negatif 32-bit tamsayı olarak yorumlanır:

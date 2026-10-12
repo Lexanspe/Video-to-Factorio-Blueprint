@@ -88,7 +88,7 @@ The grid generator steps outwards in both negative and positive directions:
        x_coords.append(cx)
        cx += step
    ```
-   *(where $\text{HalfReach} = \lfloor \text{step} / 2 \rfloor$)*
+   *(where `half_reach = step // 2`)*
 
 3. **Substation Coordinate List:**
    $$\text{SubstationsList} = \{ (tx, ty) \mid tx \in x_{coords}, \ ty \in y_{coords} \}$$
@@ -128,21 +128,21 @@ For sandbox gameplay, creative worlds, or modded setups utilizing electric floor
 ```mermaid
 graph TD
     subgraph PowerGrid["Automated 2D Substation Power Mesh"]
-        S_00["Substation (-2, -2)"] ---|Copper Wire| S_10["Substation (16, -2)"]
-        S_00 ---|Copper Wire| S_01["Substation (-2, 16)"]
-        S_10 ---|Copper Wire| S_11["Substation (16, 16)"]
-        S_01 ---|Copper Wire| S_11
+        S_00["Substation (-2, -2)"] ---|"Copper Wire"| S_10["Substation (16, -2)"]
+        S_00 ---|"Copper Wire"| S_01["Substation (-2, 16)"]
+        S_10 ---|"Copper Wire"| S_11["Substation (16, 16)"]
+        S_01 ---|"Copper Wire"| S_11
     end
 
     subgraph AnchorGroup["Alignment & Clock Bridge"]
-        ANC1["Primary Anchor (-1, -1)"] ---|Copper Wire| ANC2["Secondary Anchor (-1, -3)"]
-        ANC1 ---|Red Wire: Clock Bridge| ANC2
-        CLK["Master Clock (signal-F)"] -->|Red Wire| ANC1
+        ANC1["Primary Anchor (-1, -1)"] ---|"Copper Wire"| ANC2["Secondary Anchor (-1, -3)"]
+        ANC1 ---|"Red Wire: Clock Bridge"| ANC2
+        CLK["Master Clock (signal-F)"] -->|"Red Wire"| ANC1
     end
 
-    ANC1 -.->|Copper Auto-Bridge (d <= reach)| S_00
-    ANC1 -->|Red Wire Bus| BORDER_LAMPS["Perimeter Screen Lamps"]
-    S_00 -.->|Supply Radius| MONITOR["Active Screen Lamps & ROM Banks"]
+    ANC1 -.->|"Copper Auto-Bridge (d <= reach)"| S_00
+    ANC1 -->|"Red Wire Bus"| BORDER_LAMPS["Perimeter Screen Lamps"]
+    S_00 -.->|"Supply Radius"| MONITOR["Active Screen Lamps & ROM Banks"]
 ```
 
 ---
@@ -231,7 +231,7 @@ Izgara oluşturucu hem negatif hem de pozitif yönde dinamik adımlarla ilerler:
        x_coords.append(cx)
        cx += step
    ```
-   *(Burada $\text{HalfReach} = \lfloor \text{step} / 2 \rfloor$)*
+   *(burada `half_reach = step // 2`)*
 
 3. **Trafo Koordinat Kümesi:**
    $$\text{SubstationsList} = \{ (tx, ty) \mid tx \in x_{coords}, \ ty \in y_{coords} \}$$
@@ -271,19 +271,19 @@ Yaratıcı haritalar, sandbox dünyaları veya zemin elektriği modları için:
 ```mermaid
 graph TD
     subgraph PowerGrid["Otomatik 2B Trafo Güç Ağı"]
-        S_00["Trafo (-2, -2)"] ---|Bakır Kablo| S_10["Trafo (16, -2)"]
-        S_00 ---|Bakır Kablo| S_01["Trafo (-2, 16)"]
-        S_10 ---|Bakır Kablo| S_11["Trafo (16, 16)"]
-        S_01 ---|Bakır Kablo| S_11
+        S_00["Trafo (-2, -2)"] ---|"Bakır Kablo"| S_10["Trafo (16, -2)"]
+        S_00 ---|"Bakır Kablo"| S_01["Trafo (-2, 16)"]
+        S_10 ---|"Bakır Kablo"| S_11["Trafo (16, 16)"]
+        S_01 ---|"Bakır Kablo"| S_11
     end
 
     subgraph AnchorGroup["Hizalama ve Saat Köprüsü"]
-        ANC1["Birincil Çapa (-1, -1)"] ---|Bakır Kablo| ANC2["İkincil Çapa (-1, -3)"]
-        ANC1 ---|Kırmızı Kablo: Saat Köprüsü| ANC2
-        CLK["Merkezi Saat (signal-F)"] -->|Kırmızı Kablo| ANC1
+        ANC1["Birincil Çapa (-1, -1)"] ---|"Bakır Kablo"| ANC2["İkincil Çapa (-1, -3)"]
+        ANC1 ---|"Kırmızı Kablo: Saat Köprüsü"| ANC2
+        CLK["Merkezi Saat (signal-F)"] -->|"Kırmızı Kablo"| ANC1
     end
 
-    ANC1 -.->|Otomatik Bakır Bağlantı (d <= menzil)| S_00
-    ANC1 -->|Kırmızı Kablo Veri Yolu| BORDER_LAMPS["Kenar Ekran Lambaları"]
-    S_00 -.->|Kapsama Yarıçapı| MONITOR["Aktif Ekran Lambaları ve ROM Bankaları"]
+    ANC1 -.->|"Otomatik Bakır Bağlantı (d <= menzil)"| S_00
+    ANC1 -->|"Kırmızı Kablo Veri Yolu"| BORDER_LAMPS["Kenar Ekran Lambaları"]
+    S_00 -.->|"Kapsama Yarıçapı"| MONITOR["Aktif Ekran Lambaları ve ROM Bankaları"]
 ```
